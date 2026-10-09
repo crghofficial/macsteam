@@ -31,6 +31,7 @@ targets:
     info:
       path: macsteam-app/Info.plist
       properties:
+        CFBundleLocalizations: [en, zh-Hans]
         CFBundleName: macSteam Config
         CFBundleDisplayName: macSteam Config
         CFBundleIdentifier: com.macsteam.app

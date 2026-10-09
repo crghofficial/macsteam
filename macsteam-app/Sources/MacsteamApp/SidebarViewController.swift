@@ -19,17 +19,17 @@ final class SidebarViewController: NSViewController {
     }
 
     private let rows: [Row] = [
-        .group("Library"),
-        .leaf(title: "Import Apps", symbol: "square.and.arrow.down",
+        .group(L10n.text("Library")),
+        .leaf(title: L10n.text("Import Apps"), symbol: "square.and.arrow.down",
               item: .importZip),
-        .leaf(title: "Apps", symbol: ConfigViewController.Section.apps.symbol,
+        .leaf(title: L10n.text("Apps"), symbol: ConfigViewController.Section.apps.symbol,
               item: .config(.apps)),
         .group("macSteam"),
-        .leaf(title: "Install", symbol: "shield.lefthalf.filled",
+        .leaf(title: L10n.text("Install"), symbol: "shield.lefthalf.filled",
               item: .install),
-        .leaf(title: "Repair Steam", symbol: "wrench.and.screwdriver",
+        .leaf(title: L10n.text("Repair Steam"), symbol: "wrench.and.screwdriver",
               item: .repair),
-        .leaf(title: "Settings", symbol: ConfigViewController.Section.settings.symbol,
+        .leaf(title: L10n.text("Settings"), symbol: ConfigViewController.Section.settings.symbol,
               item: .config(.settings)),
     ]
 

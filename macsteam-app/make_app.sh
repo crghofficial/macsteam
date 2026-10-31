@@ -23,11 +23,11 @@ mkdir -p "$APP/Contents/Frameworks"
 cp ".build/release/$BIN_NAME" "$APP/Contents/MacOS/$BIN_NAME"
 install_name_tool -add_rpath @executable_path/../Frameworks "$APP/Contents/MacOS/$BIN_NAME"
 cp "$ICON_SRC" "$APP/Contents/Resources/AppIcon.icns"
-# SwiftPM resources must travel with the .app, not depend on the build directory.
+# SwiftPM resources must travel with the app bundle.
 RESOURCE_BUNDLE=".build/release/MacsteamApp_MacsteamApp.bundle"
 test -d "$RESOURCE_BUNDLE"
 cp -R "$RESOURCE_BUNDLE" "$APP/Contents/Resources/"
-# Finder and system dialogs use the main app's localization, not the SwiftPM bundle.
+# Keep language names visible to Finder and system dialogs as well.
 for language in en zh-Hans; do
     mkdir -p "$APP/Contents/Resources/$language.lproj"
     cp "Sources/MacsteamApp/Resources/$language.lproj/InfoPlist.strings" \
@@ -64,14 +64,14 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleExecutable</key>      <string>$BIN_NAME</string>
     <key>CFBundleIconFile</key>        <string>AppIcon</string>
     <key>CFBundlePackageType</key>     <string>APPL</string>
-    <key>CFBundleShortVersionString</key> <string>0.8.0</string>
-    <key>CFBundleVersion</key>         <string>11</string>
+    <key>CFBundleShortVersionString</key> <string>0.8.2</string>
+    <key>CFBundleVersion</key>         <string>13</string>
     <key>LSMinimumSystemVersion</key>  <string>13.0</string>
     <key>LSApplicationCategoryType</key> <string>public.app-category.utilities</string>
     <key>NSHumanReadableCopyright</key> <string>© 2026 Selectively11</string>
     <key>NSHighResolutionCapable</key> <true/>
     <key>NSPrincipalClass</key>        <string>NSApplication</string>
-    <key>SUFeedURL</key>               <string>https://raw.githubusercontent.com/Selectively11/macsteam/main/appcast.xml</string>
+    <key>SUFeedURL</key>               <string>https://raw.githubusercontent.com/crghofficial/macsteam/main/appcast.xml</string>
     <key>SUPublicEDKey</key>           <string>rDOXzJ+vt12aWeu9hATgvz6q46MlRcgR4gbTfj5YuWQ=</string>
 </dict>
 </plist>

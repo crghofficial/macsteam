@@ -91,12 +91,12 @@ _Static_assert(offsetof(License_t, ownerId)         == 0x64, "ownerId");
 typedef struct __attribute__((packed)) {
     uint8_t  _pad00[0x20];
     uint32_t eMsg;              // 0x20
-    uint8_t  _pad24[0x30 - 0x24];
-    void    *body;              // 0x30
+    uint8_t  _pad24[0x38 - 0x24];
+    void    *body;              // 0x38 (0x30 up to build 1788652215)
 } CProtoBufMsg_t;
 
 _Static_assert(offsetof(CProtoBufMsg_t, eMsg) == 0x20, "eMsg");
-_Static_assert(offsetof(CProtoBufMsg_t, body) == 0x30, "body");
+_Static_assert(offsetof(CProtoBufMsg_t, body) == 0x38, "body");
 
 // CNetPacket
 typedef struct __attribute__((packed)) {

@@ -39,11 +39,11 @@ final class InstallViewController: NSViewController {
         detailLabel.lineBreakMode = .byWordWrapping
         detailLabel.maximumNumberOfLines = 0
 
-        installButton = makeButton(title: "Install", target: self, action: #selector(doInstall))
+        installButton = makeButton(title: L10n.text("Install"), target: self, action: #selector(doInstall))
         installButton.keyEquivalent = "\r"
-        uninstallButton = makeButton(title: "Uninstall", target: self, action: #selector(doUninstall))
-        updateBlockButton = makeButton(title: "Allow Updates", target: self, action: #selector(toggleUpdateBlock))
-        openButton = makeButton(title: "Open Steam", target: self, action: #selector(openSteam))
+        uninstallButton = makeButton(title: L10n.text("Uninstall"), target: self, action: #selector(doUninstall))
+        updateBlockButton = makeButton(title: L10n.text("Allow Updates"), target: self, action: #selector(toggleUpdateBlock))
+        openButton = makeButton(title: L10n.text("Open Steam"), target: self, action: #selector(openSteam))
 
         spinner = NSProgressIndicator()
         spinner.translatesAutoresizingMaskIntoConstraints = false
@@ -125,28 +125,28 @@ final class InstallViewController: NSViewController {
 
         switch status {
         case .installed:
-            installButton.title = "Reinstall"
+            installButton.title = L10n.text("Reinstall")
             uninstallButton.isEnabled = true
             openButton.isEnabled = true
         case .outdated:
-            installButton.title = "Update"
+            installButton.title = L10n.text("Update")
             uninstallButton.isEnabled = true
             openButton.isEnabled = true
         case .notInstalled:
-            installButton.title = "Install"
+            installButton.title = L10n.text("Install")
             uninstallButton.isEnabled = false
             openButton.isEnabled = true
         case .foreign:
-            installButton.title = "Install"
+            installButton.title = L10n.text("Install")
             uninstallButton.isEnabled = true
             openButton.isEnabled = true
         case .steamMissing:
-            installButton.title = "Install"
+            installButton.title = L10n.text("Install")
             uninstallButton.isEnabled = false
             openButton.isEnabled = false
         }
 
-        updateBlockButton.title = blockOn ? "Allow Updates" : "Block Updates"
+        updateBlockButton.title = blockOn ? L10n.text("Allow Updates") : L10n.text("Block Updates")
         switch status {
         case .installed, .outdated: updateBlockButton.isEnabled = true
         default: updateBlockButton.isEnabled = false
@@ -164,19 +164,19 @@ final class InstallViewController: NSViewController {
     private func summarize(status: SteamInstaller.Status, blockOn: Bool) -> Summary {
         switch status {
         case .steamMissing:
-            return Summary(tone: .bad, headline: "Steam not found",
-                           detail: "Steam isn't in your Applications folder. Install it from Valve, then come back.")
+            return Summary(tone: .bad, headline: L10n.text("Steam not found"),
+                           detail: L10n.text("Steam isn't in your Applications folder. Install it from Valve, then come back."))
         case .installed:
             return blockOn
-                ? Summary(tone: .ok, headline: "Installed", detail: "")
-                : Summary(tone: .warn, headline: "Installed, updates allowed",
-                          detail: "Steam can update its client. A future update will break macSteam until macSteam is updated to match.")
+                ? Summary(tone: .ok, headline: L10n.text("Installed"), detail: "")
+                : Summary(tone: .warn, headline: L10n.text("Installed, updates allowed"),
+                          detail: L10n.text("Steam can update its client. A future update will break macSteam until macSteam is updated to match."))
         case .outdated(let bundled, let deployed):
-            return Summary(tone: .warn, headline: "Update available",
-                           detail: "A newer dylib is bundled (v\(bundled)). The installed version is v\(deployed). Click Update to apply it.")
+            return Summary(tone: .warn, headline: L10n.text("Update available"),
+                           detail: L10n.format("A newer dylib is bundled (v%1$@). The installed version is v%2$@. Click Update to apply it.", bundled, deployed))
         case .notInstalled, .foreign:
-            return Summary(tone: .ok, headline: "Ready to install",
-                           detail: "Steam is present. Click Install to patch it.")
+            return Summary(tone: .ok, headline: L10n.text("Ready to install"),
+                           detail: L10n.text("Steam is present. Click Install to patch it."))
         }
     }
 
@@ -203,22 +203,16 @@ final class InstallViewController: NSViewController {
         let alert = NSAlert()
         alert.alertStyle = .warning
         if tooOld {
-            alert.messageText = "Steam version is older than the supported version"
-            alert.informativeText = "Your Steam client is on a build of Steam that is older "
-                + "than the build that macSteam supports. This installer can upgrade you to the "
-                + "latest supported version of Steam, or you can install on your current "
-                + "build\u{2026}at your own risk."
-            alert.addButton(withTitle: "Update and Install")
+            alert.messageText = L10n.text("Steam version is older than the supported version")
+            alert.informativeText = L10n.text("Your Steam client is on a build of Steam that is older than the build that macSteam supports. This installer can upgrade you to the latest supported version of Steam, or you can install on your current build\u{2026}at your own risk.")
+            alert.addButton(withTitle: L10n.text("Update and Install"))
         } else {
-            alert.messageText = "Steam version is newer than the supported version!"
-            alert.informativeText = "Your Steam client is on a build of Steam that is newer "
-                + "than the build that macSteam supports! This installer can downgrade you to "
-                + "the latest supported version of Steam, or you can install anyway on your "
-                + "current build\u{2026}at your own risk."
-            alert.addButton(withTitle: "Downgrade and Install")
+            alert.messageText = L10n.text("Steam version is newer than the supported version!")
+            alert.informativeText = L10n.text("Your Steam client is on a build of Steam that is newer than the build that macSteam supports! This installer can downgrade you to the latest supported version of Steam, or you can install anyway on your current build\u{2026}at your own risk.")
+            alert.addButton(withTitle: L10n.text("Downgrade and Install"))
         }
-        alert.addButton(withTitle: "Install Anyway")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: L10n.text("Install Anyway"))
+        alert.addButton(withTitle: L10n.text("Cancel"))
 
         switch alert.runModal() {
         case .alertFirstButtonReturn:  runInstall(dylib: dylib, pinFirst: true)
@@ -228,7 +222,7 @@ final class InstallViewController: NSViewController {
     }
 
     private func runInstall(dylib: URL, pinFirst: Bool) {
-        runBusy(verb: "Installing") {
+        runBusy(verb: L10n.text("Installing")) {
             switch SteamInstaller.status() {
             case .installed, .outdated:
                 try SteamInstaller.install(sourceDylib: dylib)
@@ -242,14 +236,13 @@ final class InstallViewController: NSViewController {
 
     @objc private func doUninstall() {
         let alert = NSAlert()
-        alert.messageText = "Uninstall macSteam from Steam?"
-        alert.informativeText = "This downloads a clean, Valve-signed Steam and replaces the "
-            + "installed one, removing macSteam completely. Takes a few minutes."
+        alert.messageText = L10n.text("Uninstall macSteam from Steam?")
+        alert.informativeText = L10n.text("This downloads a clean, Valve-signed Steam and replaces the installed one, removing macSteam completely. Takes a few minutes.")
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Uninstall")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: L10n.text("Uninstall"))
+        alert.addButton(withTitle: L10n.text("Cancel"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
-        runBusy(verb: "Uninstalling") { try MacCrab.uninstallToStock() }
+        runBusy(verb: L10n.text("Uninstalling")) { try MacCrab.uninstallToStock() }
     }
 
     @objc private func toggleUpdateBlock() {
@@ -258,13 +251,11 @@ final class InstallViewController: NSViewController {
             return
         }
         let alert = NSAlert()
-        alert.messageText = "Allow Steam to update?"
-        alert.informativeText = "macSteam blocks the Steam client from updating the client "
-            + "itself. If you disable this behavior, a future Steam update will break macSteam "
-            + "until macSteam is updated to match. You have been warned."
+        alert.messageText = L10n.text("Allow Steam to update?")
+        alert.informativeText = L10n.text("macSteam blocks the Steam client from updating the client itself. If you disable this behavior, a future Steam update will break macSteam until macSteam is updated to match. You have been warned.")
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Continue")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: L10n.text("Continue"))
+        alert.addButton(withTitle: L10n.text("Cancel"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         runBusy { try SteamInstaller.disableUpdateBlock() }
     }
@@ -273,7 +264,7 @@ final class InstallViewController: NSViewController {
         NSWorkspace.shared.open(Paths.steamApp)
     }
 
-    private func runBusy(verb: String = "Working", _ work: @escaping @Sendable () throws -> Void) {
+    private func runBusy(verb: String = L10n.text("Working"), _ work: @escaping @Sendable () throws -> Void) {
         statusGlyph.image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath",
                                     accessibilityDescription: nil)
         statusGlyph.contentTintColor = .secondaryLabelColor

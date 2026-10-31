@@ -23,6 +23,16 @@ mkdir -p "$APP/Contents/Frameworks"
 cp ".build/release/$BIN_NAME" "$APP/Contents/MacOS/$BIN_NAME"
 install_name_tool -add_rpath @executable_path/../Frameworks "$APP/Contents/MacOS/$BIN_NAME"
 cp "$ICON_SRC" "$APP/Contents/Resources/AppIcon.icns"
+# SwiftPM resources must travel with the app bundle.
+RESOURCE_BUNDLE=".build/release/MacsteamApp_MacsteamApp.bundle"
+test -d "$RESOURCE_BUNDLE"
+cp -R "$RESOURCE_BUNDLE" "$APP/Contents/Resources/"
+# Keep language names visible to Finder and system dialogs as well.
+for language in en zh-Hans; do
+    mkdir -p "$APP/Contents/Resources/$language.lproj"
+    cp "Sources/MacsteamApp/Resources/$language.lproj/InfoPlist.strings" \
+       "$APP/Contents/Resources/$language.lproj/"
+done
 
 # Built by the top-level Makefile (make rebuild).
 DYLIB_SRC="../out/macsteam.dylib"
@@ -46,6 +56,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleDevelopmentRegion</key> <string>en</string>
+    <key>CFBundleLocalizations</key> <array><string>en</string><string>zh-Hans</string></array>
     <key>CFBundleName</key>            <string>macSteam Config</string>
     <key>CFBundleDisplayName</key>     <string>macSteam Config</string>
     <key>CFBundleIdentifier</key>      <string>$BUNDLE_ID</string>

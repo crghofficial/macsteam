@@ -27,7 +27,7 @@ final class ConfigViewController: NSViewController {
             }
         }
 
-        var title: String { rawValue }
+        var title: String { L10n.text(rawValue) }
     }
 
     init(store: ConfigStore) {
@@ -62,7 +62,7 @@ final class ConfigViewController: NSViewController {
             try work()
         } catch {
             NSSound.beep()
-            presentAlert("Couldn’t save config", error.localizedDescription, style: .warning)
+            presentAlert(L10n.text("Couldn’t save config"), error.localizedDescription, style: .warning)
         }
     }
 
@@ -71,8 +71,8 @@ final class ConfigViewController: NSViewController {
         alert.messageText = message
         alert.informativeText = informative
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Remove")     // .alertFirstButtonReturn
-        alert.addButton(withTitle: "Cancel")     // .alertSecondButtonReturn
+        alert.addButton(withTitle: L10n.text("Remove"))     // .alertFirstButtonReturn
+        alert.addButton(withTitle: L10n.text("Cancel"))     // .alertSecondButtonReturn
         return alert.runModal() == .alertFirstButtonReturn
     }
 
@@ -106,20 +106,20 @@ final class ConfigViewController: NSViewController {
         hideWhatsNewSwitch.state = store.config.hideWhatsNew ? .on : .off
         hideWhatsNewSwitch.target = self
         hideWhatsNewSwitch.action = #selector(settingsChanged)
-        hideWhatsNewSwitch.setAccessibilityLabel("Hide What's New shelf")
+        hideWhatsNewSwitch.setAccessibilityLabel(L10n.text("Hide What's New shelf"))
 
         let togglesCard = SettingsCard(rows: [
-            SettingRow(title: "Hide What's New shelf",
+            SettingRow(title: L10n.text("Hide What's New shelf"),
                        subtitle: nil,
                        control: hideWhatsNewSwitch),
         ])
 
-        let generalHeader = settingsGroupLabel("General")
+        let generalHeader = settingsGroupLabel(L10n.text("General"))
 
         // Updates section
         let updater = UpdaterManager.shared
 
-        let btn = NSButton(title: "Check for Updates…", target: self,
+        let btn = NSButton(title: L10n.text("Check for Updates…"), target: self,
                            action: #selector(checkForUpdatesTapped))
         btn.bezelStyle = .rounded
         btn.controlSize = .regular
@@ -130,19 +130,19 @@ final class ConfigViewController: NSViewController {
         autoSwitch.state = updater.automaticallyChecksForUpdates ? .on : .off
         autoSwitch.target = self
         autoSwitch.action = #selector(autoUpdateChanged)
-        autoSwitch.setAccessibilityLabel("Automatically check for updates")
+        autoSwitch.setAccessibilityLabel(L10n.text("Automatically check for updates"))
         autoUpdateSwitch = autoSwitch
 
         let updatesCard = SettingsCard(rows: [
-            SettingRow(title: "Automatically check for updates",
+            SettingRow(title: L10n.text("Automatically check for updates"),
                        subtitle: nil,
                        control: autoSwitch),
-            SettingRow(title: "Check for Updates",
+            SettingRow(title: L10n.text("Check for Updates"),
                        subtitle: nil,
                        control: btn),
         ])
 
-        let updatesHeader = settingsGroupLabel("Updates")
+        let updatesHeader = settingsGroupLabel(L10n.text("Updates"))
 
         updaterSub = updater.$canCheckForUpdates
             .receive(on: DispatchQueue.main)
@@ -208,17 +208,17 @@ final class ConfigViewController: NSViewController {
             if let game = baseGames.first, removed.count > 1 {
                 let n = list.dlcCount(for: game)
                 return self.confirmDestructive(
-                    "Remove \(list.displayName(for: game)) and its \(n) DLC?",
-                    informative: "This removes the game and its DLC from the macSteam "
-                        + "configuration. macSteam will no longer unlock the title.")
+                    L10n.format("Remove %1$@ and its %2$@ DLC?", list.displayName(for: game), n),
+                    informative: L10n.text("This removes the game and its DLC from the macSteam configuration. macSteam will no longer unlock the title."))
             }
-            let names = ListFormatter.localizedString(
-                byJoining: removed.map { list.displayName(for: $0) })
-            let titleNoun = removed.count > 1 ? "these titles" : "the title"
+            let formatter = ListFormatter()
+            formatter.locale = L10n.locale()
+            let displayNames = removed.map { list.displayName(for: $0) }
+            let names = formatter.string(from: displayNames) ?? displayNames.joined(separator: ", ")
+            let titleNoun = removed.count > 1 ? L10n.text("these titles") : L10n.text("the title")
             return self.confirmDestructive(
-                "Remove \(names)?",
-                informative: "This removes \(names) from the macSteam configuration. "
-                    + "macSteam will no longer unlock \(titleNoun).")
+                L10n.format("Remove %1$@?", names),
+                informative: L10n.format("This removes %1$@ from the macSteam configuration. macSteam will no longer unlock %2$@.", names, titleNoun))
         }
         appsCardList = list
         return list.listView

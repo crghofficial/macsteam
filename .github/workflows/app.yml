@@ -20,9 +20,17 @@ jobs:
         working-directory: macsteam-app
         run: ./make_app.sh
 
-      - name: Upload macOS app
+      - name: Package DMG
+        run: |
+          hdiutil create \
+            -volname "macSteam Config" \
+            -srcfolder "macsteam-app/macSteam Config.app" \
+            -ov -format UDZO \
+            "macSteam-zh-Hans.dmg"
+
+      - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
-          name: macSteam-zh-Hans-macOS
-          path: macsteam-app/macSteam Config.app
+          name: macSteam-zh-Hans-DMG
+          path: macSteam-zh-Hans.dmg
           if-no-files-found: error

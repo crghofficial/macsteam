@@ -13,8 +13,8 @@
       <description><![CDATA[<ul><li>Support Steam build 1794536281</li><li>Fix SteamStub ticket forge</li></ul>]]></description>
       <enclosure url="https://github.com/crghofficial/macsteam/releases/download/v0.8.3/macSteam-0.8.3.dmg"
                  type="application/octet-stream"
-                 sparkle:edSignature="39rQMzfu/LyZrlCXSlUWEVxbShryhgYdu4vqA0Ybi81PHtaejLVz8rYntGWqPMawWSXWjcHeqlucptuF3aXHDA=="
-                 length="1881982" />
+                 sparkle:edSignature="yc+vVTqqGaKO6FlfNYt+bYnqrcgmHKNKHtoka2tqHYK59j9O1RbRzNUAA0VMKDmwxqbe3LAgNG/KVE7y1jl6BA=="
+                 length="1882024" />
     </item>
     <item>
       <title>Version 0.8.2</title>

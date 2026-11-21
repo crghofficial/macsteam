@@ -174,12 +174,11 @@ func presentAlert(_ title: String, _ message: String, style: NSAlert.Style = .in
 @MainActor
 func presentAppManagementAlert() {
     let a = NSAlert()
-    a.messageText = "macSteam needs permission to modify apps"
-    a.informativeText = "Enable macSteam under Privacy & Security \u{203A} App Management, "
-        + "then try again."
+    a.messageText = L10n.text("macSteam needs permission to modify apps")
+    a.informativeText = L10n.text("Enable macSteam under Privacy & Security \u{203A} App Management, then try again.")
     a.alertStyle = .warning
-    a.addButton(withTitle: "Open Settings")
-    a.addButton(withTitle: "Cancel")
+    a.addButton(withTitle: L10n.text("Open Settings"))
+    a.addButton(withTitle: L10n.text("Cancel"))
     guard a.runModal() == .alertFirstButtonReturn else { return }
     if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AppBundles") {
         NSWorkspace.shared.open(url)
@@ -245,7 +244,7 @@ func runBusy(spinner: NSProgressIndicator,
                 if error is SteamInstaller.PermissionDenied {
                     presentAppManagementAlert()
                 } else {
-                    presentAlert("Couldn't complete", error.localizedDescription, style: .warning)
+                    presentAlert(L10n.text("Couldn't complete"), error.localizedDescription, style: .warning)
                 }
             }
             refresh()

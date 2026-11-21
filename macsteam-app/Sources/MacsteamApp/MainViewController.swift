@@ -82,13 +82,13 @@ final class MainViewController: NSSplitViewController {
         switch item {
         case .install:
             child = installVC
-            title = "Install"
+            title = L10n.text("Install")
         case .repair:
             child = repairVC
-            title = "Repair Steam"
+            title = L10n.text("Repair Steam")
         case .importZip:
             child = importVC
-            title = "Import Apps"
+            title = L10n.text("Import Apps")
         case .config(let section):
             configVC.select(section: section)
             child = configVC

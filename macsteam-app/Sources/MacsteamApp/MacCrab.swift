@@ -65,29 +65,28 @@ enum MacCrab {
     static func repair(progress: (@Sendable (String) -> Void)? = nil) throws {
         let fm = FileManager.default
         guard fm.fileExists(atPath: Paths.steamAppExecutable.path) else {
-            throw StepFailure(step: "Locate Steam", detail: "/Applications/Steam.app not found.")
+            throw StepFailure(step: L10n.text("Locate Steam"), detail: L10n.text("/Applications/Steam.app not found."))
         }
         guard fm.fileExists(atPath: Paths.packageDir.path) else {
-            throw StepFailure(step: "Locate package",
-                          detail: "The client package dir is missing. "
-                                + "Open Steam once so it unbundles, then try again.")
+            throw StepFailure(step: L10n.text("Locate package"),
+                          detail: L10n.text("The client package dir is missing. Open Steam once so it unbundles, then try again."))
         }
         try SteamInstaller.ensureModifiable()
 
-        progress?("Stopping Steam")
+        progress?(L10n.text("Stopping Steam"))
         killSteam()
 
-        progress?("Blocking update on launch")
+        progress?(L10n.text("Blocking update on launch"))
         try SteamInstaller.writeUpdateBlock()
 
         try PackageFetcher.stageFromValve(progress: progress)
 
-        progress?("Starting local package server")
+        progress?(L10n.text("Starting local package server"))
         let server = PackageServer(root: Paths.packageDir)
         try server.start()
         defer { server.stop() }
 
-        progress?("Running client update")
+        progress?(L10n.text("Running client update"))
         let args = [
             "-forcesteamupdate",
             "-forcepackagedownload",
@@ -97,53 +96,51 @@ enum MacCrab {
         // Exit code unreliable (-exitsteam gives 254); manifest version is the real signal.
         let result = runOuter(args)
 
-        progress?("Verifying build")
+        progress?(L10n.text("Verifying build"))
         guard let version = detectedVersion() else {
-            throw StepFailure(step: "Verify build",
-                          detail: "Update ran (exit \(result.code)) but the client version "
-                                + "couldn't be read afterward.")
+            throw StepFailure(step: L10n.text("Verify build"),
+                          detail: L10n.format("Update ran (exit %1$@) but the client version couldn't be read afterward.", result.code))
         }
         if version != supportedVersion {
-            throw StepFailure(step: "Verify build",
-                          detail: "Update ran but the client is on \(version), not the "
-                                + "supported \(supportedVersion).")
+            throw StepFailure(step: L10n.text("Verify build"),
+                          detail: L10n.format("Update ran but the client is on %1$@, not the supported %2$@.", version, supportedVersion))
         }
 
-        progress?("Done")
+        progress?(L10n.text("Done"))
     }
 
     // MARK: - Stock repair (clean bundle + pinned build)
 
     static func repairToStock(progress: (@Sendable (String) -> Void)? = nil) throws {
         if steamIsRunning() {
-            progress?("Quitting Steam so it can be repaired")
+            progress?(L10n.text("Quitting Steam so it can be repaired"))
             killSteam()
         }
 
         try SteamBundleInstaller.downloadAndReplace(progress: progress)
 
-        progress?("Unpacking the fresh client")
+        progress?(L10n.text("Unpacking the fresh client"))
         _ = runOuter(["-exitsteam"])
 
         try repair(progress: progress)
 
-        progress?("Steam has been repaired")
+        progress?(L10n.text("Steam has been repaired"))
     }
 
     // MARK: - Uninstall (clean bundle, no pin)
 
     static func uninstallToStock(progress: (@Sendable (String) -> Void)? = nil) throws {
         if steamIsRunning() {
-            progress?("Quitting Steam so it can be removed")
+            progress?(L10n.text("Quitting Steam so it can be removed"))
             killSteam()
         }
 
         try SteamBundleInstaller.downloadAndReplace(progress: progress)
 
-        progress?("Clearing macSteam settings")
+        progress?(L10n.text("Clearing macSteam settings"))
         try? SteamInstaller.disableUpdateBlock()
 
-        progress?("macSteam has been removed")
+        progress?(L10n.text("macSteam has been removed"))
     }
 
     // MARK: - Install preflight
@@ -152,7 +149,7 @@ enum MacCrab {
         if SteamBundleInstaller.isPristineValveBundle(Paths.steamApp) { return }
         if SteamBundleInstaller.hasLoadableInjectedLibraries(Paths.steamApp) { return }
         if steamIsRunning() {
-            progress?("Quitting Steam")
+            progress?(L10n.text("Quitting Steam"))
             killSteam()
         }
         try SteamBundleInstaller.downloadAndReplace(progress: progress)
@@ -160,7 +157,7 @@ enum MacCrab {
 
     static func pinToSupported(progress: (@Sendable (String) -> Void)? = nil) throws {
         if !FileManager.default.fileExists(atPath: Paths.packageDir.path) {
-            progress?("Unpacking the client")
+            progress?(L10n.text("Unpacking the client"))
             _ = runOuter(["-exitsteam"])
         }
         try repair(progress: progress)

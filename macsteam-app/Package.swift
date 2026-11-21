@@ -6,7 +6,8 @@ var targets: [Target] = [
     .executableTarget(
         name: "MacsteamApp",
         dependencies: ["Sparkle"],
-        path: "Sources/MacsteamApp"
+        path: "Sources/MacsteamApp",
+        resources: [.process("Resources")]
     )
 ]
 
@@ -20,6 +21,7 @@ if FileManager.default.fileExists(atPath: "Tests/MacsteamAppTests") {
 
 let package = Package(
     name: "MacsteamApp",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v13)
     ],

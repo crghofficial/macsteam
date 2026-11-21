@@ -16,26 +16,25 @@ enum PackageFetcher {
         let manifestURL = localManifest()
         guard let manifestURL,
               let text = try? String(contentsOf: manifestURL, encoding: .utf8) else {
-            throw StepFailure(step: "Read manifest",
-                          detail: "No steam_client_osx manifest in the package dir. "
-                                + "Open Steam once so it unbundles, then try again.")
+            throw StepFailure(step: L10n.text("Read manifest"),
+                          detail: L10n.text("No steam_client_osx manifest in the package dir. Open Steam once so it unbundles, then try again."))
         }
 
         let components = parse(text)
         guard !components.isEmpty else {
-            throw StepFailure(step: "Parse manifest",
-                          detail: "The client manifest listed no component files.")
+            throw StepFailure(step: L10n.text("Parse manifest"),
+                          detail: L10n.text("The client manifest listed no component files."))
         }
 
         try Paths.ensureDir(Paths.packageDir)
 
         let needed = components.filter { !fileValid($0, in: Paths.packageDir, fm: fm) }
         if needed.isEmpty {
-            progress?("Client files already staged")
+            progress?(L10n.text("Client files already staged"))
             return
         }
 
-        progress?("Downloading \(needed.count) client files from Valve")
+        progress?(L10n.format("Downloading %1$@ client files from Valve", needed.count))
         try download(needed, into: Paths.packageDir, progress: progress)
     }
 
@@ -149,7 +148,7 @@ enum PackageFetcher {
             gate.wait()
             group.enter()
             guard let url = URL(string: "\(cdnBase)/\(c.name)") else {
-                box.record(StepFailure(step: "Build URL", detail: c.name))
+                box.record(StepFailure(step: L10n.text("Build URL"), detail: c.name))
                 gate.signal()
                 group.leave()
                 continue
@@ -158,20 +157,20 @@ enum PackageFetcher {
                 defer { gate.signal(); group.leave() }
                 if box.hasError { return }   // another file already failed
                 if let error {
-                    box.record(StepFailure(step: "Download \(c.name)", detail: error.localizedDescription))
+                    box.record(StepFailure(step: L10n.format("Download %1$@", c.name), detail: error.localizedDescription))
                     return
                 }
                 guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                     let code = (response as? HTTPURLResponse)?.statusCode ?? -1
-                    box.record(StepFailure(step: "Download \(c.name)", detail: "HTTP \(code)"))
+                    box.record(StepFailure(step: L10n.format("Download %1$@", c.name), detail: "HTTP \(code)"))
                     return
                 }
                 guard let tmp, let data = try? Data(contentsOf: tmp) else {
-                    box.record(StepFailure(step: "Download \(c.name)", detail: "empty response body"))
+                    box.record(StepFailure(step: L10n.format("Download %1$@", c.name), detail: L10n.text("empty response body")))
                     return
                 }
                 guard sha256Hex(data) == c.sha2.lowercased() else {
-                    box.record(StepFailure(step: "Verify \(c.name)", detail: "sha2 mismatch"))
+                    box.record(StepFailure(step: L10n.format("Verify %1$@", c.name), detail: L10n.text("sha2 mismatch")))
                     return
                 }
                 let dest = dir.appendingPathComponent(c.name)
@@ -179,11 +178,11 @@ enum PackageFetcher {
                     try? FileManager.default.removeItem(at: dest)
                     try data.write(to: dest, options: .atomic)
                 } catch {
-                    box.record(StepFailure(step: "Write \(c.name)", detail: error.localizedDescription))
+                    box.record(StepFailure(step: L10n.format("Write %1$@", c.name), detail: error.localizedDescription))
                     return
                 }
                 let n = doneCount.increment()
-                progress?("Downloaded \(n)/\(total) client files")
+                progress?(L10n.format("Downloaded %1$@/%2$@ client files", n, total))
             }
             task.resume()
         }

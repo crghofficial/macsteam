@@ -26,9 +26,9 @@ enum ImportError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .unzipFailed(let m): return "Failed to unzip: \(m)"
-        case .noLua:              return "No .lua script found in the zip."
-        case .luaReadFailed(let name, let e): return "Couldn't read \(name): \(e.localizedDescription)"
+        case .unzipFailed(let m): return L10n.format("Failed to unzip: %1$@", m)
+        case .noLua:              return L10n.text("No .lua script found in the zip.")
+        case .luaReadFailed(let name, let e): return L10n.format("Couldn't read %1$@: %2$@", name, e.localizedDescription)
         }
     }
 }
@@ -178,18 +178,18 @@ enum ZipImporter {
     @discardableResult
     static func merge(_ plan: ImportPlan, into cfg: inout MacsteamConfig) -> [String] {
         var changes: [String] = []
-        guard let app = plan.mainAppID else { return ["No main app id; nothing merged."] }
+        guard let app = plan.mainAppID else { return [L10n.text("No main app id; nothing merged.")] }
 
-        if cfg.addApp(app) { changes.append("Added app \(app) to Apps") }
+        if cfg.addApp(app) { changes.append(L10n.format("Added app %1$@ to Apps", app)) }
         if cfg.addPackage(Paths.defaultInjectionPackage) {
-            changes.append("Added package \(Paths.defaultInjectionPackage) to PackageIds")
+            changes.append(L10n.format("Added package %1$@ to PackageIds", Paths.defaultInjectionPackage))
         }
         // Ownership gates key off the flat Apps list (sx_config_has_app), so each DLC
         // appid must be in Apps to unlock.
         var dlcAdded = 0
         for dlc in plan.dlcAppIDs where cfg.addApp(dlc) { dlcAdded += 1 }
         if dlcAdded > 0 {
-            changes.append("Added \(dlcAdded) DLC app(s) to Apps: "
+            changes.append(L10n.format("Added %1$@ DLC app(s) to Apps: ", dlcAdded)
                 + plan.dlcAppIDs.map(String.init).joined(separator: ", "))
         }
         for id in cfg.apps {
@@ -212,9 +212,9 @@ enum ZipImporter {
             }
         }
         if depotCount > 0 {
-            changes.append("Added \(depotCount) depot key(s)")
+            changes.append(L10n.format("Added %1$@ depot key(s)", depotCount))
         }
-        if changes.isEmpty { changes.append("No config changes (already present).") }
+        if changes.isEmpty { changes.append(L10n.text("No config changes (already present).")) }
         return changes
     }
 
@@ -223,7 +223,7 @@ enum ZipImporter {
     private static func unzip(_ zip: URL, into dir: URL) throws {
         let result = Subprocess.run("/usr/bin/unzip", ["-o", zip.path, "-d", dir.path])
         if result.code != 0 {
-            throw ImportError.unzipFailed(result.stderr.isEmpty ? "status \(result.code)" : result.stderr)
+            throw ImportError.unzipFailed(result.stderr.isEmpty ? L10n.format("status %1$@", result.code) : result.stderr)
         }
     }
 

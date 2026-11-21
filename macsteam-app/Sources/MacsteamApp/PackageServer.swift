@@ -23,7 +23,7 @@ final class PackageServer {
         do {
             listener = try NWListener(using: params)
         } catch {
-            throw StepFailure(step: "Start package server", detail: error.localizedDescription)
+            throw StepFailure(step: L10n.text("Start package server"), detail: error.localizedDescription)
         }
         self.listener = listener
 
@@ -51,12 +51,12 @@ final class PackageServer {
 
         if ready.wait(timeout: .now() + 5) == .timedOut {
             stop()
-            throw StepFailure(step: "Start package server",
-                              detail: "timed out waiting for port \(port.rawValue)")
+            throw StepFailure(step: L10n.text("Start package server"),
+                              detail: L10n.format("timed out waiting for port %1$@", port.rawValue))
         }
         if let e = box.error {
             stop()
-            throw StepFailure(step: "Start package server", detail: e)
+            throw StepFailure(step: L10n.text("Start package server"), detail: e)
         }
     }
 

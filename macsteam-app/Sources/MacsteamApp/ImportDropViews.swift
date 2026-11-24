@@ -59,7 +59,7 @@ final class DropZoneView: ImportDropView {
     }
 
     private let glyph = NSImageView()
-    private let label = NSTextField(labelWithString: "Drop Zips, Folders, or .lua Files Here")
+    private let label = NSTextField(labelWithString: L10n.text("Drop Zips, Folders, or .lua Files Here"))
     private let borderLayer = CAShapeLayer()
 
     override var isTargeted: Bool { didSet { applyAppearance() } }
@@ -76,7 +76,7 @@ final class DropZoneView: ImportDropView {
         layer?.addSublayer(borderLayer)
 
         glyph.image = NSImage(systemSymbolName: "arrow.down.doc",
-                              accessibilityDescription: "Drop files")
+                              accessibilityDescription: L10n.text("Drop files"))
         glyph.symbolConfiguration = .init(pointSize: 26, weight: .regular)
         glyph.translatesAutoresizingMaskIntoConstraints = false
 
@@ -100,8 +100,8 @@ final class DropZoneView: ImportDropView {
 
         setAccessibilityElement(true)
         setAccessibilityRole(.button)
-        setAccessibilityLabel("Choose files to import")
-        setAccessibilityHelp("Drop unlock zips or lua files here, or activate to browse.")
+        setAccessibilityLabel(L10n.text("Choose files to import"))
+        setAccessibilityHelp(L10n.text("Drop unlock zips or lua files here, or activate to browse."))
         glyph.setAccessibilityElement(false)
 
         applyAppearance()

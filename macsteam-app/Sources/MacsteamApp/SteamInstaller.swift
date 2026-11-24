@@ -57,10 +57,10 @@ enum SteamInstaller {
     static func install(sourceDylib: URL) throws {
         let fm = FileManager.default
         guard fm.fileExists(atPath: Paths.steamApp.path) else {
-            throw StepFailure(step: "Locate Steam", detail: "/Applications/Steam.app not found. Install Steam first.")
+            throw StepFailure(step: L10n.text("Locate Steam"), detail: L10n.text("/Applications/Steam.app not found. Install Steam first."))
         }
         guard fm.fileExists(atPath: sourceDylib.path) else {
-            throw StepFailure(step: "Locate payload", detail: "Bundled macsteam.dylib is missing.")
+            throw StepFailure(step: L10n.text("Locate payload"), detail: L10n.text("Bundled macsteam.dylib is missing."))
         }
         try ensureModifiable()
 
@@ -79,7 +79,7 @@ enum SteamInstaller {
                 try? version.write(to: versionFile, atomically: true, encoding: .utf8)
             }
         } catch {
-            throw StepFailure(step: "Copy payload", detail: error.localizedDescription)
+            throw StepFailure(step: L10n.text("Copy payload"), detail: error.localizedDescription)
         }
 
         try deploySignatures()
@@ -106,7 +106,7 @@ enum SteamInstaller {
                 try body.write(to: url, atomically: true, encoding: .utf8)
             } catch {
                 if url == Paths.steamCfgRoot {
-                    throw StepFailure(step: "Write steam.cfg", detail: error.localizedDescription)
+                    throw StepFailure(step: L10n.text("Write steam.cfg"), detail: error.localizedDescription)
                 }
             }
         }
@@ -154,7 +154,7 @@ enum SteamInstaller {
             let add = Subprocess.run("/usr/libexec/PlistBuddy",
                           ["-c", "Add \(keyPath) string \(value)", Paths.steamAppInfoPlist.path])
             if add.code != 0 {
-                throw StepFailure(step: "Patch Info.plist", detail: add.stderr.isEmpty ? set.stderr : add.stderr)
+                throw StepFailure(step: L10n.text("Patch Info.plist"), detail: add.stderr.isEmpty ? set.stderr : add.stderr)
             }
         }
     }
@@ -162,7 +162,7 @@ enum SteamInstaller {
     private static func adhocSign(_ url: URL) throws {
         let out = Subprocess.run("/usr/bin/codesign", ["-f", "-s", "-", url.path])
         if out.code != 0 {
-            throw StepFailure(step: "Sign \(url.lastPathComponent)", detail: out.stderr)
+            throw StepFailure(step: L10n.format("Sign %1$@", url.lastPathComponent), detail: out.stderr)
         }
     }
 
@@ -176,7 +176,7 @@ enum SteamInstaller {
 
     private static func deploySignatures() throws {
         guard let bundledSigs = Bundle.main.url(forResource: "signatures", withExtension: nil) else {
-            throw StepFailure(step: "Deploy signatures", detail: "Bundled signatures missing from app.")
+            throw StepFailure(step: L10n.text("Deploy signatures"), detail: L10n.text("Bundled signatures missing from app."))
         }
         let dest = Paths.signaturesDir
         let fm = FileManager.default
@@ -211,7 +211,7 @@ enum SteamInstaller {
                && (e.code == NSFileWriteNoPermissionError || e.code == NSFileWriteVolumeReadOnlyError) {
             throw PermissionDenied()
         } catch {
-            throw StepFailure(step: "Check Steam.app access", detail: error.localizedDescription)
+            throw StepFailure(step: L10n.text("Check Steam.app access"), detail: error.localizedDescription)
         }
     }
 }

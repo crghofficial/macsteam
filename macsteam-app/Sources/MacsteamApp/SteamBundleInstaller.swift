@@ -22,10 +22,10 @@ enum SteamBundleInstaller {
             }
         }
 
-        progress?("Downloading a clean Steam from Valve")
+        progress?(L10n.text("Downloading a clean Steam from Valve"))
         try downloadDMG(to: dmg)
 
-        progress?("Verifying the downloaded Steam")
+        progress?(L10n.text("Verifying the downloaded Steam"))
         let mount = work.appendingPathComponent("mnt", isDirectory: true)
         try Paths.ensureDir(mount)
         try attach(dmg, at: mount)
@@ -33,11 +33,11 @@ enum SteamBundleInstaller {
 
         let source = mount.appendingPathComponent("Steam.app")
         guard fm.fileExists(atPath: source.path) else {
-            throw StepFailure(step: "Read image", detail: "No Steam.app inside the downloaded image.")
+            throw StepFailure(step: L10n.text("Read image"), detail: L10n.text("No Steam.app inside the downloaded image."))
         }
         try verifyValveSigned(source)
 
-        progress?("Installing the clean Steam")
+        progress?(L10n.text("Installing the clean Steam"))
         try replaceInstalled(with: source, asideDir: work)
 
         try verifyValveSigned(Paths.steamApp)
@@ -48,8 +48,8 @@ enum SteamBundleInstaller {
     private static func downloadDMG(to dest: URL) throws {
         let r = Subprocess.run("/usr/bin/curl", ["-fSL", dmgURL, "-o", dest.path])
         guard r.code == 0, FileManager.default.fileExists(atPath: dest.path) else {
-            throw StepFailure(step: "Download Steam",
-                          detail: r.stderr.isEmpty ? "curl exit \(r.code)" : r.stderr)
+            throw StepFailure(step: L10n.text("Download Steam"),
+                          detail: r.stderr.isEmpty ? L10n.format("curl exit %1$@", r.code) : r.stderr)
         }
     }
 
@@ -60,8 +60,8 @@ enum SteamBundleInstaller {
                                ["attach", dmg.path, "-nobrowse", "-readonly",
                                 "-mountpoint", mount.path])
         guard r.code == 0 else {
-            throw StepFailure(step: "Mount image",
-                          detail: r.stderr.isEmpty ? "hdiutil exit \(r.code)" : r.stderr)
+            throw StepFailure(step: L10n.text("Mount image"),
+                          detail: r.stderr.isEmpty ? L10n.format("hdiutil exit %1$@", r.code) : r.stderr)
         }
     }
 
@@ -92,14 +92,14 @@ enum SteamBundleInstaller {
         let strict = Subprocess.run("/usr/bin/codesign",
                                     ["--verify", "--strict", "--verbose=2", app.path])
         guard strict.code == 0 else {
-            throw StepFailure(step: "Verify signature",
-                          detail: "codesign strict check failed: "
-                                + (strict.stderr.isEmpty ? "exit \(strict.code)" : strict.stderr))
+            throw StepFailure(step: L10n.text("Verify signature"),
+                          detail: L10n.text("codesign strict check failed: ")
+                                + (strict.stderr.isEmpty ? L10n.format("exit %1$@", strict.code) : strict.stderr))
         }
         let info = Subprocess.run("/usr/bin/codesign", ["-dvv", app.path])
         guard info.stderr.contains("TeamIdentifier=\(valveTeamID)") else {
-            throw StepFailure(step: "Verify signature",
-                          detail: "Bundle is not signed by Valve (team \(valveTeamID)).")
+            throw StepFailure(step: L10n.text("Verify signature"),
+                          detail: L10n.format("Bundle is not signed by Valve (team %1$@).", valveTeamID))
         }
     }
 
@@ -118,8 +118,8 @@ enum SteamBundleInstaller {
                 try? fm.removeItem(at: aside)
                 try fm.moveItem(at: target, to: aside)
             } catch {
-                throw StepFailure(step: "Replace Steam",
-                              detail: "Couldn't move the old Steam aside: \(error.localizedDescription)")
+                throw StepFailure(step: L10n.text("Replace Steam"),
+                              detail: L10n.format("Couldn't move the old Steam aside: %1$@", error.localizedDescription))
             }
         }
 
@@ -130,8 +130,8 @@ enum SteamBundleInstaller {
                 try? fm.removeItem(at: target)
                 try? fm.moveItem(at: aside, to: target)
             }
-            throw StepFailure(step: "Replace Steam",
-                          detail: "Couldn't copy the clean Steam in: \(error.localizedDescription)")
+            throw StepFailure(step: L10n.text("Replace Steam"),
+                          detail: L10n.format("Couldn't copy the clean Steam in: %1$@", error.localizedDescription))
         }
     }
 }

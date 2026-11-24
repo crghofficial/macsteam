@@ -92,8 +92,8 @@ final class AppCardListView: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
         list.translatesAutoresizingMaskIntoConstraints = false
 
         emptyState = EmptyStateView(symbol: "square.stack.3d.up",
-                                    prompt: "No games yet",
-                                    hint: "Import a game to add it.")
+                                    prompt: L10n.text("No games yet"),
+                                    hint: L10n.text("Import a game to add it."))
         emptyState.isHidden = !store.config.apps.isEmpty
 
         let sizeBar = makeSizeSliderBar(
@@ -101,7 +101,7 @@ final class AppCardListView: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
             min: Self.minRowHeight, max: Self.maxRowHeight,
             defaultValue: Self.defaultRowHeight,
             currentValue: rowHeight,
-            accessibilityLabel: "Game row size",
+            accessibilityLabel: L10n.text("Game row size"),
             smallGlyphSize: 12, largeGlyphSize: 18)
 
         let footerDivider = NSBox()
@@ -324,7 +324,7 @@ final class AppCardListView: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
     func displayName(for appID: Int) -> String {
         if let n = art.name(for: appID) { return n }
         if let n = store.config.appNames[appID], !n.isEmpty { return n }
-        return "App \(appID)"
+        return L10n.format("App %1$@", appID)
     }
 
     // DLC count nested under a base game, for the removal confirmation copy.
@@ -389,13 +389,13 @@ extension AppCardListView: NSMenuDelegate {
     private func removeMenuTitle(for rows: [Int]) -> String {
         if rows.count == 1, case let node as AppNode = outline.item(atRow: rows[0]) {
             let n = node.dlc.count
-            if n > 0 { return "Remove \(displayName(for: node.appID)) and \(n) DLC" }
-            return "Remove \(displayName(for: node.appID))"
+            if n > 0 { return L10n.format("Remove %1$@ and %2$@ DLC", displayName(for: node.appID), n) }
+            return L10n.format("Remove %1$@", displayName(for: node.appID))
         }
         if rows.count == 1, case let child as DLCNode = outline.item(atRow: rows[0]) {
-            return "Remove \(displayName(for: child.appID))"
+            return L10n.format("Remove %1$@", displayName(for: child.appID))
         }
-        return "Remove \(rows.count) Items"
+        return L10n.format("Remove %1$@ Items", rows.count)
     }
 }
 
@@ -488,7 +488,7 @@ final class AppRowCell: NSTableCellView {
     }
 
     func configure(name: String, appID: Int, art image: NSImage?, isDLC: Bool) {
-        nameLabel.stringValue = name.isEmpty ? "App \(appID)" : name
+        nameLabel.stringValue = name.isEmpty ? L10n.format("App %1$@", appID) : name
         nameLabel.font = .systemFont(ofSize: 14, weight: isDLC ? .regular : .semibold)
 
         setArt(image)

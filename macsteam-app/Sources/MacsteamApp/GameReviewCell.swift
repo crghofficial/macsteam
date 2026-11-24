@@ -70,7 +70,7 @@ final class GameReviewCell: NSTableCellView {
         removeButton.isBordered = false
         removeButton.bezelStyle = .regularSquare
         removeButton.imagePosition = .imageOnly
-        removeButton.image = NSImage(systemSymbolName: "xmark.circle.fill", accessibilityDescription: "Remove game")
+        removeButton.image = NSImage(systemSymbolName: "xmark.circle.fill", accessibilityDescription: L10n.text("Remove game"))
         removeButton.symbolConfiguration = .init(pointSize: 15, weight: .regular)
         removeButton.contentTintColor = Colors.quiet
         removeButton.target = self
@@ -78,8 +78,8 @@ final class GameReviewCell: NSTableCellView {
         removeButton.translatesAutoresizingMaskIntoConstraints = false
         removeButton.setContentHuggingPriority(.required, for: .horizontal)
         removeButton.alphaValue = 0
-        removeButton.toolTip = "Remove game from the review"
-        removeButton.setAccessibilityLabel("Remove game")
+        removeButton.toolTip = L10n.text("Remove game from the review")
+        removeButton.setAccessibilityLabel(L10n.text("Remove game"))
 
         let text = NSStackView(views: [titleLabel, summaryLabel])
         text.orientation = .vertical
@@ -147,12 +147,12 @@ final class GameReviewCell: NSTableCellView {
         glyph.contentTintColor = importable ? Colors.secondaryText : Colors.quiet
         summaryLabel.stringValue = summary
 
-        markerLabel.stringValue = importable ? "" : "Can’t import"
+        markerLabel.stringValue = importable ? "" : L10n.text("Can’t import")
         markerLabel.textColor = importable ? Colors.secondaryText : .secondaryLabelColor
 
         setAccessibilityElement(true)
         setAccessibilityRole(.group)
-        setAccessibilityLabel(importable ? "\(shown). \(summary)." : "\(shown). \(summary). Can’t import.")
+        setAccessibilityLabel(importable ? L10n.format("%1$@. %2$@.", shown, summary) : L10n.format("%1$@. %2$@. Can’t import.", shown, summary))
     }
 
     func setName(_ name: String) {

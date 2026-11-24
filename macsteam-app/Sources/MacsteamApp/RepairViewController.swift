@@ -44,9 +44,9 @@ final class RepairViewController: NSViewController {
         buildLabel.lineBreakMode = .byTruncatingTail
         buildLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        repairButton = makeButton(title: "Repair", target: self, action: #selector(doRepair))
+        repairButton = makeButton(title: L10n.text("Repair"), target: self, action: #selector(doRepair))
         repairButton.keyEquivalent = "\r"
-        openButton = makeButton(title: "Open Steam", target: self, action: #selector(openSteam))
+        openButton = makeButton(title: L10n.text("Open Steam"), target: self, action: #selector(openSteam))
 
         spinner = NSProgressIndicator()
         spinner.translatesAutoresizingMaskIntoConstraints = false
@@ -117,7 +117,7 @@ final class RepairViewController: NSViewController {
         if steamPresent {
             glyph.image = NSImage(systemSymbolName: "wrench.and.screwdriver", accessibilityDescription: nil)
             glyph.contentTintColor = .secondaryLabelColor
-            headlineLabel.stringValue = "Repair Steam"
+            headlineLabel.stringValue = L10n.text("Repair Steam")
             detailLabel.stringValue = ""
             detailLabel.isHidden = true
             buildLabel.stringValue = currentBuildLine()
@@ -125,9 +125,8 @@ final class RepairViewController: NSViewController {
         } else {
             glyph.image = NSImage(systemSymbolName: StatusTone.bad.symbol, accessibilityDescription: nil)
             glyph.contentTintColor = StatusTone.bad.color
-            headlineLabel.stringValue = "Steam not found"
-            detailLabel.stringValue = "Steam isn't in your Applications folder. Install it from Valve, "
-                + "then come back to repair it."
+            headlineLabel.stringValue = L10n.text("Steam not found")
+            detailLabel.stringValue = L10n.text("Steam isn't in your Applications folder. Install it from Valve, then come back to repair it.")
             buildLabel.stringValue = ""
             buildLabel.isHidden = true
         }
@@ -139,10 +138,10 @@ final class RepairViewController: NSViewController {
     private func currentBuildLine() -> String {
         switch MacCrab.status() {
         case .supported, .unsupported:
-            if let v = MacCrab.detectedVersion() { return "Current Steam Build: \(v)" }
-            return "Current Steam Build: unknown"
+            if let v = MacCrab.detectedVersion() { return L10n.format("Current Steam Build: %1$@", v) }
+            return L10n.text("Current Steam Build: unknown")
         case .unknown:
-            return "Current Steam Build: unreadable"
+            return L10n.text("Current Steam Build: unreadable")
         case .steamMissing:
             return ""
         }
@@ -152,12 +151,11 @@ final class RepairViewController: NSViewController {
 
     @objc private func doRepair() {
         let alert = NSAlert()
-        alert.messageText = "Reinstall Steam at the latest build?"
-        alert.informativeText = "This will remove macSteam and download a clean copy of Steam. "
-            + "This can take a few minutes."
+        alert.messageText = L10n.text("Reinstall Steam at the latest build?")
+        alert.informativeText = L10n.text("This will remove macSteam and download a clean copy of Steam. This can take a few minutes.")
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "Repair")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: L10n.text("Repair"))
+        alert.addButton(withTitle: L10n.text("Cancel"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         runRepair()
     }
@@ -169,7 +167,7 @@ final class RepairViewController: NSViewController {
     private func runRepair() {
         setBusy(true)
         spinner.startAnimation(nil)
-        setRepairing("Getting ready to repair Steam")
+        setRepairing(L10n.text("Getting ready to repair Steam"))
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let result: Result<Void, Error> = Result {
@@ -188,7 +186,7 @@ final class RepairViewController: NSViewController {
                     if error is SteamInstaller.PermissionDenied {
                         presentAppManagementAlert()
                     } else {
-                        presentAlert("Couldn't repair", error.localizedDescription, style: .warning)
+                        presentAlert(L10n.text("Couldn't repair"), error.localizedDescription, style: .warning)
                     }
                     self.refresh()
                 }
@@ -209,9 +207,8 @@ final class RepairViewController: NSViewController {
     private func setSucceeded() {
         glyph.image = NSImage(systemSymbolName: StatusTone.ok.symbol, accessibilityDescription: nil)
         glyph.contentTintColor = StatusTone.ok.color
-        headlineLabel.stringValue = "Steam repaired"
-        detailLabel.stringValue = "Steam has been restored to an unmodified client. "
-            + "Run Install to patch Steam with macSteam."
+        headlineLabel.stringValue = L10n.text("Steam repaired")
+        detailLabel.stringValue = L10n.text("Steam has been restored to an unmodified client. Run Install to patch Steam with macSteam.")
         detailLabel.isHidden = false
         buildLabel.stringValue = ""
         buildLabel.isHidden = true

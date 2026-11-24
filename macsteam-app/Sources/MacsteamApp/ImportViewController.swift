@@ -8,13 +8,13 @@ private extension ImportPlan {
 
     var summary: String {
         guard let app = mainAppID else {
-            return "No app id in the file, can't import"
+            return L10n.text("No app id in the file, can't import")
         }
-        var parts = ["App \(app)"]
-        if dlcAppIDs.count == 1 { parts.append("1 DLC") }
-        else if dlcAppIDs.count > 1 { parts.append("\(dlcAppIDs.count) DLC") }
+        var parts = [L10n.format("App %1$@", app)]
+        if dlcAppIDs.count == 1 { parts.append(L10n.text("1 DLC")) }
+        else if dlcAppIDs.count > 1 { parts.append(L10n.format("%1$@ DLC", dlcAppIDs.count)) }
         let keys = depotKeys.count
-        if keys > 0 { parts.append("\(keys) depot key\(keys == 1 ? "" : "s")") }
+        if keys > 0 { parts.append(L10n.count("%ld depot keys", keys)) }
         return parts.joined(separator: "  ·  ")
     }
 }
@@ -91,14 +91,14 @@ final class ImportViewController: NSViewController {
         dropView.onDrop = { [weak self] urls in self?.loadPlans(from: urls) }
         dropView.onActivate = { [weak self] in self?.pickZipAction() }
 
-        pickButton = makeButton(title: "Choose Files…", target: self, action: #selector(pickZipAction))
+        pickButton = makeButton(title: L10n.text("Choose Files…"), target: self, action: #selector(pickZipAction))
 
         spinner = NSProgressIndicator()
         spinner.translatesAutoresizingMaskIntoConstraints = false
         spinner.style = .spinning
         spinner.controlSize = .small
         spinner.isDisplayedWhenStopped = false
-        spinner.setAccessibilityLabel("Working")
+        spinner.setAccessibilityLabel(L10n.text("Working"))
 
         statusLabel = NSTextField(labelWithString: "")
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -107,10 +107,10 @@ final class ImportViewController: NSViewController {
         statusLabel.lineBreakMode = .byTruncatingTail
         statusLabel.maximumNumberOfLines = 1
 
-        reviewCaption = settingsGroupLabel("Review")
+        reviewCaption = settingsGroupLabel(L10n.text("Review"))
         reviewCaption.translatesAutoresizingMaskIntoConstraints = false
 
-        addButton = makeButton(title: "Add Zips…", target: self, action: #selector(pickZipAction))
+        addButton = makeButton(title: L10n.text("Add Zips…"), target: self, action: #selector(pickZipAction))
 
         listBar = makeListBar()
 
@@ -158,7 +158,7 @@ final class ImportViewController: NSViewController {
             listBar.bottomAnchor.constraint(equalTo: reviewCard.bottomAnchor),
         ])
 
-        applyButton = makeButton(title: "Import", target: self, action: #selector(applyAction))
+        applyButton = makeButton(title: L10n.text("Import"), target: self, action: #selector(applyAction))
         applyButton.keyEquivalent = "\r"
         applyButton.isEnabled = false
 
@@ -258,7 +258,7 @@ final class ImportViewController: NSViewController {
         successDetail.textColor = Colors.secondaryText
         successDetail.alignment = .center
 
-        let importMore = makeButton(title: "Import More", target: self,
+        let importMore = makeButton(title: L10n.text("Import More"), target: self,
                                     action: #selector(successImportMore))
         importMore.keyEquivalent = "\r"
 
@@ -296,8 +296,8 @@ final class ImportViewController: NSViewController {
 
         if items.isEmpty { ZipImporter.sweepStaleExtractDirs() }
 
-        let noun = sources.count == 1 ? "file" : "\(sources.count) files"
-        setBusy(true, status: "Reading \(noun)…")
+        let noun = sources.count == 1 ? L10n.text("file") : L10n.format("%1$@ files", sources.count)
+        setBusy(true, status: L10n.format("Reading %1$@…", noun))
 
         let generation = batchGeneration
 
@@ -346,13 +346,13 @@ final class ImportViewController: NSViewController {
 
         let importable = items.filter { $0.isImportable }.count
         let skipped = items.count - importable
-        var status = importable == 1 ? "1 game ready to import" : "\(importable) games ready to import"
-        if skipped > 0 { status += "  ·  \(skipped) skipped (no app id)" }
+        var status = importable == 1 ? L10n.text("1 game ready to import") : L10n.format("%1$@ games ready to import", importable)
+        if skipped > 0 { status += L10n.format("  ·  %1$@ skipped (no app id)", skipped) }
         setStatus(status, tint: .labelColor)
         announce(status)
 
         if !failures.isEmpty {
-            presentAlert("Couldn’t read some files",
+            presentAlert(L10n.text("Couldn’t read some files"),
                          failures.joined(separator: "\n"), style: .warning)
         }
     }
@@ -453,11 +453,11 @@ final class ImportViewController: NSViewController {
     }
 
     private func showSuccess(games: Int, dlc: Int) {
-        let headline = "Imported \(games) game\(games == 1 ? "" : "s")"
+        let headline = L10n.count("Imported %ld games", games)
         successTitle.stringValue = headline
         successTitle.setAccessibilityLabel(headline)
         if dlc > 0 {
-            successDetail.stringValue = "\(dlc) DLC added"
+            successDetail.stringValue = L10n.format("%1$@ DLC added", dlc)
             successDetail.isHidden = false
         } else {
             successDetail.stringValue = ""
@@ -465,7 +465,7 @@ final class ImportViewController: NSViewController {
         }
         setStatus("", tint: .secondaryLabelColor)
         setState(.success)
-        announce(dlc > 0 ? "\(headline), \(dlc) DLC added" : headline)
+        announce(dlc > 0 ? L10n.format("%1$@, %2$@ DLC added", headline, dlc) : headline)
     }
 
     // MARK: list bottom-bar
@@ -477,7 +477,7 @@ final class ImportViewController: NSViewController {
             min: Self.minRowHeight, max: Self.maxRowHeight,
             defaultValue: Self.defaultRowHeight,
             currentValue: rowHeight,
-            accessibilityLabel: "Review row size")
+            accessibilityLabel: L10n.text("Review row size"))
         sizeSlider.target = self
         sizeSlider.action = #selector(sizeSliderChanged)
 
@@ -521,8 +521,8 @@ final class ImportViewController: NSViewController {
         reviewTable.reloadData()
         refreshActionBar()
         setState(.empty)
-        setStatus("Cleared.", tint: .secondaryLabelColor)
-        announce("Cleared")
+        setStatus(L10n.text("Cleared."), tint: .secondaryLabelColor)
+        announce(L10n.text("Cleared"))
     }
 
     @objc private func applyAction() {
@@ -530,7 +530,7 @@ final class ImportViewController: NSViewController {
         let selected = items.filter { $0.isImportable }
         guard !selected.isEmpty else { return }
 
-        setBusy(true, status: "Applying import…")
+        setBusy(true, status: L10n.text("Applying import…"))
 
         let allManifests = selected.flatMap(\.manifestFiles)
         let plans = selected
@@ -548,7 +548,7 @@ final class ImportViewController: NSViewController {
             switch copyResult {
             case .failure(let error):
                 self.refreshActionBar()
-                presentAlert("Import failed", error.localizedDescription, style: .warning)
+                presentAlert(L10n.text("Import failed"), error.localizedDescription, style: .warning)
             case .success:
                 do {
                     var dlcTotal = 0
@@ -571,7 +571,7 @@ final class ImportViewController: NSViewController {
                 } catch {
                     Task.detached { ZipImporter.removeCopiedManifests(allManifests) }
                     self.refreshActionBar()
-                    presentAlert("Import failed", error.localizedDescription, style: .warning)
+                    presentAlert(L10n.text("Import failed"), error.localizedDescription, style: .warning)
                 }
             }
         }
@@ -589,7 +589,7 @@ final class ImportViewController: NSViewController {
                 target.insertItem(removed, at: min(row, target.items.count))
             }
         }
-        reviewUndoManager.setActionName("Remove Game")
+        reviewUndoManager.setActionName(L10n.text("Remove Game"))
 
         reloadReviewKeepingArt()
         if items.isEmpty { setStatus("", tint: .secondaryLabelColor) }
@@ -607,7 +607,7 @@ final class ImportViewController: NSViewController {
                 target.reloadReviewKeepingArt()
             }
         }
-        reviewUndoManager.setActionName("Remove Game")
+        reviewUndoManager.setActionName(L10n.text("Remove Game"))
 
         reloadReviewKeepingArt()
         resolveArt(for: [item])
@@ -675,14 +675,14 @@ extension ImportViewController: NSMenuDelegate {
         menu.removeAllItems()
         let row = reviewTable.clickedRow
         if row >= 0, row < items.count {
-            let remove = NSMenuItem(title: "Remove",
+            let remove = NSMenuItem(title: L10n.text("Remove"),
                                     action: #selector(ctxRemove(_:)), keyEquivalent: "")
             remove.tag = row
             remove.target = self
             menu.addItem(remove)
             menu.addItem(.separator())
         }
-        let match = NSMenuItem(title: "Use This Size in the Apps List",
+        let match = NSMenuItem(title: L10n.text("Use This Size in the Apps List"),
                                action: #selector(useSizeInApps), keyEquivalent: "")
         match.target = self
         menu.addItem(match)

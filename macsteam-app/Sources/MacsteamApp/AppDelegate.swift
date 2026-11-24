@@ -2,7 +2,7 @@ import AppKit
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let appName = "macSteam Config"
+    private let appName = L10n.text("macSteam Config")
     let store = ConfigStore()
     private let updaterManager = UpdaterManager.shared
     var window: NSWindow!
@@ -71,37 +71,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let appMenuItem = NSMenuItem()
         mainMenu.addItem(appMenuItem)
         let appMenu = NSMenu()
-        appMenu.addItem(withTitle: "About \(appName)",
+        appMenu.addItem(withTitle: L10n.format("About %1$@", appName),
                         action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
                         keyEquivalent: "")
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Check for Updates…",
+        appMenu.addItem(withTitle: L10n.text("Check for Updates…"),
                         action: #selector(checkForUpdatesMenu),
                         keyEquivalent: "")
         appMenu.addItem(.separator())
         let servicesMenu = NSMenu()
         NSApp.servicesMenu = servicesMenu
-        appMenu.addItem(withTitle: "Services", action: nil, keyEquivalent: "").submenu = servicesMenu
+        appMenu.addItem(withTitle: L10n.text("Services"), action: nil, keyEquivalent: "").submenu = servicesMenu
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Hide \(appName)",
+        appMenu.addItem(withTitle: L10n.format("Hide %1$@", appName),
                         action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
-        let hideOthers = appMenu.addItem(withTitle: "Hide Others",
+        let hideOthers = appMenu.addItem(withTitle: L10n.text("Hide Others"),
                         action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
         hideOthers.keyEquivalentModifierMask = [.command, .option]
-        appMenu.addItem(withTitle: "Show All",
+        appMenu.addItem(withTitle: L10n.text("Show All"),
                         action: #selector(NSApplication.unhideAllApplications(_:)), keyEquivalent: "")
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Quit \(appName)",
+        appMenu.addItem(withTitle: L10n.format("Quit %1$@", appName),
                         action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         appMenuItem.submenu = appMenu
 
         let fileMenuItem = NSMenuItem()
         mainMenu.addItem(fileMenuItem)
-        let fileMenu = NSMenu(title: "File")
-        fileMenu.addItem(withTitle: "Import Zip…",
+        let fileMenu = NSMenu(title: L10n.text("File"))
+        fileMenu.addItem(withTitle: L10n.text("Import Zip…"),
                          action: #selector(MainViewController.importZip), keyEquivalent: "i").target = nil
         fileMenu.addItem(.separator())
-        let removeItem = fileMenu.addItem(withTitle: "Remove",
+        let removeItem = fileMenu.addItem(withTitle: L10n.text("Remove"),
                          action: Selector(("removeApps:")), keyEquivalent: String(UnicodeScalar(NSDeleteCharacter)!))
         removeItem.keyEquivalentModifierMask = [.command]
         removeItem.target = nil
@@ -109,31 +109,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let editMenuItem = NSMenuItem()
         mainMenu.addItem(editMenuItem)
-        let editMenu = NSMenu(title: "Edit")
-        editMenu.addItem(withTitle: "Undo", action: Selector(("undo:")), keyEquivalent: "z")
-        let redoItem = editMenu.addItem(withTitle: "Redo", action: Selector(("redo:")), keyEquivalent: "z")
+        let editMenu = NSMenu(title: L10n.text("Edit"))
+        editMenu.addItem(withTitle: L10n.text("Undo"), action: Selector(("undo:")), keyEquivalent: "z")
+        let redoItem = editMenu.addItem(withTitle: L10n.text("Redo"), action: Selector(("redo:")), keyEquivalent: "z")
         redoItem.keyEquivalentModifierMask = [.command, .shift]
         editMenu.addItem(.separator())
-        editMenu.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
-        editMenu.addItem(withTitle: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
-        editMenu.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
-        editMenu.addItem(withTitle: "Delete", action: #selector(NSText.delete(_:)), keyEquivalent: "")
-        editMenu.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        editMenu.addItem(withTitle: L10n.text("Cut"), action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        editMenu.addItem(withTitle: L10n.text("Copy"), action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        editMenu.addItem(withTitle: L10n.text("Paste"), action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        editMenu.addItem(withTitle: L10n.text("Delete"), action: #selector(NSText.delete(_:)), keyEquivalent: "")
+        editMenu.addItem(withTitle: L10n.text("Select All"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
         editMenuItem.submenu = editMenu
 
         let windowMenuItem = NSMenuItem()
         mainMenu.addItem(windowMenuItem)
-        let windowMenu = NSMenu(title: "Window")
-        windowMenu.addItem(withTitle: "Minimize",
+        let windowMenu = NSMenu(title: L10n.text("Window"))
+        windowMenu.addItem(withTitle: L10n.text("Minimize"),
                            action: #selector(NSWindow.performMiniaturize(_:)), keyEquivalent: "m")
-        windowMenu.addItem(withTitle: "Zoom",
+        windowMenu.addItem(withTitle: L10n.text("Zoom"),
                            action: #selector(NSWindow.performZoom(_:)), keyEquivalent: "")
         windowMenuItem.submenu = windowMenu
         NSApp.windowsMenu = windowMenu
 
         let helpMenuItem = NSMenuItem()
         mainMenu.addItem(helpMenuItem)
-        let helpMenu = NSMenu(title: "Help")
+        let helpMenu = NSMenu(title: L10n.text("Help"))
         helpMenuItem.submenu = helpMenu
         NSApp.helpMenu = helpMenu
 

@@ -21,6 +21,10 @@ Pretty boring.
 
 ## macSteam Config
 
+The companion app supports English and Simplified Chinese, following macOS's
+preferred or per-app language. See [Localization](docs/LOCALIZATION.md) for
+translation, packaging, and validation details.
+
 The companion app can handle all the basics. It can deploy the macSteam dylib, it can import games, you can use it to remove games from your unlock list, you can toggle the features that support being toggled (with more to come). You can also edit the config by hand by going to ```~/Library/Application Support/macSteam``` and editing the config file.
 
 ## Usage
